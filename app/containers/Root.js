@@ -6,7 +6,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import green from '@material-ui/core/colors/green';
 import grey from '@material-ui/core/colors/grey';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Routes from '../routes';
+import Routes from '../Routes';
 
 type Props = {
   store: {},
@@ -43,11 +43,12 @@ const theme = createMuiTheme({
 
 export default class Root extends Component<Props> {
   render() {
+    const { store, history } = this.props;
     return (
-      <Provider store={this.props.store}>
+      <Provider store={store}>
         <MuiThemeProvider theme={theme}>
           <CssBaseline />
-          <ConnectedRouter history={this.props.history}>
+          <ConnectedRouter history={history}>
             <Routes />
           </ConnectedRouter>
         </MuiThemeProvider>

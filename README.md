@@ -14,14 +14,14 @@ See below for the origin, this just adds some material-ui v1 style and example b
 [![OpenCollective](https://opencollective.com/electron-react-boilerplate/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/electron-react-boilerplate/sponsors/badge.svg)](#sponsors)
 
-[![React](/internals/img/react-padded-90.png)](https://facebook.github.io/react/)
-[![Webpack](/internals/img/webpack-padded-90.png)](https://webpack.github.io/)
-[![Redux](/internals/img/redux-padded-90.png)](http://redux.js.org/)
-[![React Router](/internals/img/react-router-padded-90.png)](https://github.com/ReactTraining/react-router)
-[![Flow](/internals/img/flow-padded-90.png)](https://flowtype.org/)
-[![ESLint](/internals/img/eslint-padded-90.png)](http://eslint.org/)
-[![Jest](/internals/img/jest-padded-90.png)](https://facebook.github.io/jest/)
-[![Yarn](/internals/img/yarn-padded-90.png)](https://yarnpkg.com/)
+[![React](./internals/img/react-padded-90.png)](https://facebook.github.io/react/)
+[![Webpack](./internals/img/webpack-padded-90.png)](https://webpack.github.io/)
+[![Redux](./internals/img/redux-padded-90.png)](http://redux.js.org/)
+[![React Router](./internals/img/react-router-padded-90.png)](https://github.com/ReactTraining/react-router)
+[![Flow](./internals/img/flow-padded-90.png)](https://flowtype.org/)
+[![ESLint](./internals/img/eslint-padded-90.png)](http://eslint.org/)
+[![Jest](./internals/img/jest-padded-90.png)](https://facebook.github.io/jest/)
+[![Yarn](./internals/img/yarn-padded-90.png)](https://yarnpkg.com/)
 
 [Electron](http://electron.atom.io/) application boilerplate based on [React](https://facebook.github.io/react/), [Redux](https://github.com/reactjs/redux), [React Router](https://github.com/reactjs/react-router), [Webpack](http://webpack.github.io/docs/), [React Transform HMR](https://github.com/gaearon/react-transform-hmr) for rapid application development.
 
@@ -31,8 +31,7 @@ See below for the origin, this just adds some material-ui v1 style and example b
 
 ## Install
 
-* **Note: requires a node version >= 7 and an npm version >= 4.**
-* **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/chentsulin/electron-react-boilerplate/issues/400)**
+- **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/chentsulin/electron-react-boilerplate/issues/400)**
 
 First, clone the repo via git:
 
@@ -46,21 +45,26 @@ And then install dependencies with yarn.
 $ cd your-project-name
 $ yarn
 ```
-**Note**: If you can't use [yarn](https://github.com/yarnpkg/yarn), run `npm install`.
 
 ## Run
 
 Start the app in the `dev` environment. This starts the renderer process in [**hot-module-replacement**](https://webpack.js.org/guides/hmr-react/) mode and starts a webpack dev server that sends hot updates to the renderer process:
 
 ```bash
-$ npm run dev
+$ yarn dev
 ```
 
 Alternatively, you can run the renderer and main processes separately. This way, you can restart one process without waiting for the other. Run these two commands **simultaneously** in different console tabs:
 
 ```bash
-$ npm run start-renderer-dev
-$ npm run start-main-dev
+$ yarn start-renderer-dev
+$ yarn start-main-dev
+```
+
+If you don't need autofocus when your files was changed, then run `dev` with env `WITHOUT_FOCUS=true`:
+
+```bash
+$ WITHOUT_FOCUS=true yarn dev
 ```
 
 ## Packaging
@@ -68,7 +72,7 @@ $ npm run start-main-dev
 To package apps for the local platform:
 
 ```bash
-$ npm run package
+$ yarn package
 ```
 
 To package apps for all platforms:
@@ -76,26 +80,28 @@ To package apps for all platforms:
 First, refer to [Multi Platform Build](https://www.electron.build/multi-platform-build) for dependencies.
 
 Then,
+
 ```bash
-$ npm run package-all
+$ yarn package-all
 ```
 
 To package apps with options:
 
 ```bash
-$ npm run package -- --[option]
+$ yarn package -- --[option]
 ```
 
 To run End-to-End Test
 
 ```bash
-$ npm run build
-$ npm run test-e2e
+$ yarn build
+$ yarn test-e2e
 ```
 
 :bulb: You can debug your production build with devtools by simply setting the `DEBUG_PROD` env variable:
+
 ```bash
-DEBUG_PROD=true npm run package
+DEBUG_PROD=true yarn package
 ```
 
 ## How to add modules to the project
@@ -114,10 +120,10 @@ This boilerplate uses a [two package.json structure](https://github.com/electron
 
 ### Which `package.json` file to use
 
-**Rule of thumb** is: all modules go into `./package.json` except native modules. Native modules go into `./app/package.json`.
+**Rule of thumb** is: all modules go into `./package.json` except native modules, or modules with native dependencies or peer dependencies. Native modules, or packages with native dependencies should go into `./app/package.json`.
 
 1. If the module is native to a platform (like node-postgres), it should be listed under `dependencies` in `./app/package.json`
-2. If a module is `import`ed by another module, include it in `dependencies` in `./package.json`.   See [this ESLint rule](https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md). Examples of such modules are `material-ui`, `redux-form`, and `moment`.
+2. If a module is `import`ed by another module, include it in `dependencies` in `./package.json`. See [this ESLint rule](https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md). Examples of such modules are `material-ui`, `redux-form`, and `moment`.
 3. Otherwise, modules used for building, testing and debugging should be included in `devDependencies` in `./package.json`.
 
 ### Further Readings
@@ -138,17 +144,19 @@ css-modules loader. e.g. `app.global.css`
 If you want to import global css libraries (like `bootstrap`), you can just write the following code in `.global.css`:
 
 ```css
-@import "~bootstrap/dist/css/bootstrap.css";
+@import '~bootstrap/dist/css/bootstrap.css';
 ```
 
 ## Sass support
 
 If you want to use Sass in your app, you only need to import `.sass` files instead of `.css` once:
+
 ```js
 import './app.global.scss';
 ```
 
 ## Static Type Checking
+
 This project comes with Flow support out of the box! You can annotate your code with types, [get Flow errors as ESLint errors](https://github.com/amilajack/eslint-plugin-flowtype-errors), and get [type errors during runtime](https://github.com/codemix/flow-runtime) during development. Types are completely optional.
 
 ## Dispatching redux actions from main process
@@ -246,6 +254,7 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 <a href="https://opencollective.com/electron-react-boilerplate/sponsor/29/website" target="_blank"><img src="https://opencollective.com/electron-react-boilerplate/sponsor/29/avatar.svg"></a>
 
 ## License
+
 MIT © [C. T. Lin](https://github.com/chentsulin)
 
 [npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square

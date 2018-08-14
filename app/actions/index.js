@@ -1,5 +1,4 @@
 // flow
-
 const TYPES: { [key: actionStringType]: actionStringType } = {
   DECREMENT_COUNTER: 'DECREMENT_COUNTER',
   INCREMENT_COUNTER: 'INCREMENT_COUNTER',
