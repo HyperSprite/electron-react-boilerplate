@@ -4,7 +4,8 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import { dependencies } from '../package.json';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import { dependencies } from '../package';
 
 export default {
   externals: [...Object.keys(dependencies || {})],
@@ -26,6 +27,7 @@ export default {
 
   output: {
     path: path.join(__dirname, '..', 'app'),
+    filename: '[name].js',
     // https://github.com/webpack/webpack/issues/1114
     libraryTarget: 'commonjs2'
   },
@@ -35,6 +37,7 @@ export default {
    */
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
+    // TODO see this line should be removable
     modules: [path.join(__dirname, '..'), 'node_modules']
   },
 
@@ -43,6 +46,18 @@ export default {
       NODE_ENV: 'production'
     }),
 
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+
+    // for sequelize database folders
+    new CopyWebpackPlugin([
+      {
+        from: 'models',
+        to: path.join(__dirname, '..', 'app', 'dist', 'models')
+      },
+      {
+        from: 'migrations',
+        to: path.join(__dirname, '..', 'app', 'dist', 'migrations')
+      }
+    ])
   ]
 };

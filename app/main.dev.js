@@ -10,24 +10,24 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 
+global.mainPath = __dirname;
+
 let mainWindow = null;
+let backgroundWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
 
-if (
-  process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG_PROD === 'true'
-) {
+const debug =
+  process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+
+if (debug) {
   require('electron-debug')();
-  const path = require('path');
-  const p = path.join(__dirname, '..', 'app', 'node_modules');
-  require('module').globalPaths.push(p);
 }
 
 const installExtensions = async () => {
@@ -53,12 +53,19 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
+  if (debug) {
     await installExtensions();
   }
+
+  // background db mgmt
+  const backgroundURL = `file://${__dirname}/background.html`;
+
+  backgroundWindow = new BrowserWindow({ show: debug });
+  if (debug) {
+    backgroundWindow.webContents.openDevTools();
+  }
+
+  backgroundWindow.loadURL(backgroundURL);
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -82,7 +89,23 @@ app.on('ready', async () => {
     }
   });
 
+  // DB comunication for UI to DB
+  ipcMain.on('TO_DB', (event, options) => {
+    // console.log('main', 'TO_DB', options);
+    backgroundWindow.webContents.send('TO_DB', options);
+  });
+
+  // DB comunication for DB to UI
+  ipcMain.on('FROM_DB', (event, options) => {
+    // console.log('main', 'FROM_DB', options);
+    mainWindow.webContents.send('FROM_DB', options);
+  });
+
   mainWindow.on('closed', () => {
+    backgroundWindow.webContents.send('TO_DB', { rType: 'DB_CLOSE' });
+    ipcMain.removeAllListeners(['TO_DB', 'FROM_DB']);
+    backgroundWindow.close();
+    backgroundWindow = null;
     mainWindow = null;
   });
 

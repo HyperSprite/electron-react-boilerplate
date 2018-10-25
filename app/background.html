@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DB</title>
+    <style type="text/css">
+      body {
+        color: #eeeeee;
+        height: 85vh;
+        overflow: auto;
+        background-color: #000060;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      Database
+    </div>
+    <script>
+      {
+        const scripts = [];
+
+        // Dynamically insert the DLL script in development env in the
+        // renderer process
+        if (process.env.NODE_ENV === 'development') {
+          scripts.push('../dll/renderer.dev.dll.js');
+        }
+
+        // Dynamically insert the bundled app script in the renderer process
+        const port = process.env.PORT || 1212;
+        scripts.push(
+          (process.env.HOT)
+            ? 'http://localhost:' + port + '/dist/background.js'
+            : './dist/background.js'
+        );
+
+        document.write(
+          scripts
+            .map(script => `<script defer src="${script}"><\/script>`)
+            .join('')
+        );
+      }
+      // see this https://stackoverflow.com/questions/20256760/javascript-console-log-to-html
+    </script>
+  </body>
+</html>

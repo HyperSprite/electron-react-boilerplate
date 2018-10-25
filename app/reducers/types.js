@@ -4,11 +4,27 @@ export type counterStateType = {
   +counter: number
 };
 
+export type taskType = {
+  createdAt: string,
+  id: string,
+  isActive: boolean,
+  isDeleted: boolean,
+  name: string,
+  updatedAt: string
+};
+
+export type taskStateType = Array<taskType>;
+
+type State = {
+  counterStateType: counterStateType,
+  taskStateType: taskStateType
+};
+
 export type Action = {
   +type: string
 };
 
-export type GetState = () => counterStateType;
+export type GetState = () => State;
 
 export type Dispatch = ReduxDispatch<Action>;
 

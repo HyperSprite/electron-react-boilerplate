@@ -1,0 +1,47 @@
+{
+    "tables": {
+        "tasks": {
+            "tableName": "tasks",
+            "schema": {
+                "id": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV4"
+                    },
+                    "primaryKey": true,
+                    "allowNull": false,
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "allowNull": false,
+                    "defaultValue": {
+                        "value": ""
+                    },
+                    "seqType": "Sequelize.TEXT"
+                },
+                "isActive": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "isDeleted": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        }
+    },
+    "revision": 1
+}

@@ -1,0 +1,5 @@
+# test files end up in here after tests
+backup
+
+# db test files created during tests
+*-test.db
