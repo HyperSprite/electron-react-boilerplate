@@ -98,7 +98,10 @@ app.on('ready', async () => {
   // DB comunication for DB to UI
   ipcMain.on('FROM_DB', (event, options) => {
     // console.log('main', 'FROM_DB', options);
-    mainWindow.webContents.send('FROM_DB', options);
+    // using rType lets us target the right ipcRenderer
+    // if there were more than one
+    const { rType, ...results } = options;
+    mainWindow.webContents.send(options.rType, results);
   });
 
   mainWindow.on('closed', () => {

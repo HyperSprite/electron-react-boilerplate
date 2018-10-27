@@ -15,13 +15,14 @@ export type optionDBAction = {
 
 // options example { rType: TASK_FETCH_ALL, { isDeleted: false } }
 export function dbAction(options: optionDBAction) {
+  const { rType } = options;
   ipcRenderer.send('TO_DB', options);
   return (dispatch: Dispatch) => {
     dispatch({ type: FETCHING_ON });
     try {
-      ipcRenderer.once('FROM_DB', (event, dbReturn) => {
-        const { rType, ...result } = dbReturn;
-        dispatch({ type: rType, payload: result.data });
+      ipcRenderer.once(rType, (event, dbReturn) => {
+        // const { rType, ...result } = dbReturn;
+        dispatch({ type: rType, payload: dbReturn.data });
         dispatch({ type: FETCHING_OFF });
       });
     } catch (error) {
