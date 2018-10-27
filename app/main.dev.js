@@ -101,7 +101,7 @@ app.on('ready', async () => {
     // using rType lets us target the right ipcRenderer
     // if there were more than one
     const { rType, ...results } = options;
-    mainWindow.webContents.send(options.rType, results);
+    mainWindow.webContents.send(rType, results);
   });
 
   mainWindow.on('closed', () => {
