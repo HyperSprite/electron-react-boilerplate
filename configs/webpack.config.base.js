@@ -51,12 +51,16 @@ export default {
     // for sequelize database folders
     new CopyWebpackPlugin([
       {
-        from: 'models',
-        to: path.join(__dirname, '..', 'app', 'dist', 'models')
-      },
-      {
         from: 'migrations',
         to: path.join(__dirname, '..', 'app', 'dist', 'migrations')
+      },
+      {
+        from: 'model-seeds',
+        to: path.join(__dirname, '..', 'app', 'dist', 'model-seeds')
+      },
+      {
+        from: 'models',
+        to: path.join(__dirname, '..', 'app', 'dist', 'models')
       }
     ])
   ]

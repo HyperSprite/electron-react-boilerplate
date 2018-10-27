@@ -30,7 +30,12 @@ export default class Home extends Component<Props> {
     // setTimeout is here becaues the database wont be ready by
     // the time we get here.
     setTimeout(
-      () => dbAction({ rType: 'TASK_FETCH_ALL', isDeleted: false }),
+      () =>
+        dbAction({
+          rType: 'TABLE_FETCH_ALL',
+          table: 'tasks',
+          isDeleted: false
+        }),
       1000
     );
   }
@@ -44,7 +49,7 @@ export default class Home extends Component<Props> {
     const { dbAction } = this.props;
     const { name } = this.state;
     event.preventDefault();
-    dbAction({ rType: 'TASK_UPDATE', name });
+    dbAction({ rType: 'TABLE_UPDATE', table: 'tasks', name });
     this.setState({ name: '' });
   }
 

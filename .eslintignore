@@ -57,3 +57,4 @@ package.json
 
 # Sequelize
 migrations/
+model-seeds/

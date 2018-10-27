@@ -6,9 +6,8 @@ import Umzug from 'umzug';
 import fs from 'fs';
 import { dirSwitch } from './lib';
 
-const migrationDir = dirSwitch('migrations');
-
-const migrate = (currentDB, action) => {
+const migrate = async (currentDB, action, dir) => {
+  const migrationDir = dirSwitch(dir);
   fs.readdir(migrationDir, (err, items) => {
     if (err) {
       console.log(chalk.white('migrationDir ERROR:'), err);
@@ -58,8 +57,10 @@ const migrate = (currentDB, action) => {
   umzug.on('reverted', logUmzugEvent('reverted'));
 
   const actions = {
-    migrateUp: () => umzug.up(),
-    migrateDown: () => umzug.down()
+    migrateUp: () => umzug.up().then(() => 'done'),
+    migrateDown: () => umzug.down(),
+    seedUp: () => umzug.up(),
+    seedDown: () => umzug.down()
     // migrateReset: () => umzug.down({ to: 0 }),
     // migrateHardReset: () =>
     //   new Promise((resolve, reject) => {
@@ -114,7 +115,7 @@ const migrate = (currentDB, action) => {
     // },
   };
 
-  actions[action]();
+  return actions[action]();
 };
 
 export default migrate;

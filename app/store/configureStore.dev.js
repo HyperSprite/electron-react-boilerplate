@@ -5,7 +5,7 @@ import { routerMiddleware, routerActions } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
 import * as counterActions from '../actions/counter';
-import * as tasksActions from '../actions/tasks';
+import * as tableActions from '../actions/tables';
 import type { reducerStateType } from '../reducers/types';
 
 const history = createHashHistory();
@@ -39,7 +39,7 @@ const configureStore = (initialState?: reducerStateType) => {
   const actionCreators = {
     ...counterActions,
     ...routerActions,
-    ...tasksActions
+    ...tableActions
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */

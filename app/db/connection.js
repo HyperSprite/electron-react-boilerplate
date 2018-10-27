@@ -25,7 +25,12 @@ db.open = async currentDB => {
     }
   });
   // fs.ensureFileSync(currentDB); // for use without migrations
-  await migrate(currentDB, 'migrateUp');
+  const migRes = await migrate(currentDB, 'migrateUp', 'migrations');
+  const seedRes = await migrate(currentDB, 'migrateUp', 'model-seeds');
+  console.log(
+    chalk.white('Open Setup:'),
+    chalk.blue(`migrations: ${migRes}, seeds ${seedRes}`)
+  );
   console.log(chalk.white('Open DB:'), chalk.blue(currentDB));
   db.sequelize = await new Sequelize(null, null, null, {
     dialect: 'sqlite',

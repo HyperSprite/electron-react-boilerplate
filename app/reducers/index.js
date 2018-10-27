@@ -2,12 +2,12 @@
 import { combineReducers } from 'redux';
 import { connectRouter } from 'connected-react-router';
 import counter from './counter';
-import tasks from './tasks';
+import tables from './tables';
 
 export default function createRootReducer(history: {}) {
   const routerReducer = connectRouter(history)(() => {});
 
   return connectRouter(history)(
-    combineReducers({ router: routerReducer, counter, tasks })
+    combineReducers({ router: routerReducer, counter, tables })
   );
 }

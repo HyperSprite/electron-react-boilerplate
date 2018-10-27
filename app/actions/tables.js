@@ -2,8 +2,9 @@
 import { ipcRenderer } from 'electron';
 import type { Dispatch } from '../reducers/types';
 
-export const TASK_FETCH_ALL = 'TASK_FETCH_ALL';
-export const TASK_UPDATE = 'TASK_UPDATE';
+export const TABLE_FETCH_ALL = 'TABLE_FETCH_ALL';
+export const TABLE_REMOVE = 'TABLE_REMOVE';
+export const TABLE_UPDATE = 'TABLE_UPDATE';
 export const FETCHING_ON = 'FETCHING_ON';
 export const FETCHING_OFF = 'FETCHING_OFF';
 export const SET_ERROR = 'SET_ERROR';
@@ -13,16 +14,16 @@ export type optionDBAction = {
   [key: string]: any
 };
 
-// options example { rType: TASK_FETCH_ALL, { isDeleted: false } }
+// options example { rType: TABLE_FETCH_ALL, table: 'tasks', isDeleted: false }
 export function dbAction(options: optionDBAction) {
-  const { rType } = options;
+  const { rType, table } = options;
   ipcRenderer.send('TO_DB', options);
   return (dispatch: Dispatch) => {
     dispatch({ type: FETCHING_ON });
     try {
       ipcRenderer.once(rType, (event, dbReturn) => {
         // const { rType, ...result } = dbReturn;
-        dispatch({ type: rType, payload: dbReturn.data });
+        dispatch({ type: rType, payload: { table, data: dbReturn.data } });
         dispatch({ type: FETCHING_OFF });
       });
     } catch (error) {

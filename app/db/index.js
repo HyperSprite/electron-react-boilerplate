@@ -1,12 +1,13 @@
 import chalk from 'chalk';
 // eslint-disable-next-line
-import { tasks } from './controllers';
+import { tables } from './controllers';
 // eslint-disable-next-line
 import { close, open } from './connection';
 
 const actionTypes = {
-  TASK_FETCH_ALL: tasks.taskFetchAll,
-  TASK_UPDATE: tasks.taskUpdate,
+  TABLE_FETCH_ALL: tables.tableFetchAll,
+  TABLE_REMOVE: tables.tableUpdate,
+  TABLE_UPDATE: tables.tableUpdate,
   DB_CLOSE: close,
   DB_OPEN: open
 };

@@ -1,24 +1,66 @@
-#ERB with a Sequelize - SQLite setup
+# ERB with a Sequelize - SQLite setup
 
 This is based on Electron React Boilerplate v0.16.0, see below for more information on that.
 
-My intention was to demonstrate how Sequelize could be integrated into **electron-react-boilerplate** in a way that allowed for robust Model and Migration creation and usage.
+My intention was to demonstrate how SQLite and Sequelize could be integrated into **electron-react-boilerplate** in a way that allowed for robust Model, Migration and Seed creation and usage.
 
-I feel the Sequelize documentation starts on the wrong page. Getting started has you build a simple, but dead end database configuration that does not allow for changes after it is populated. So you build your cool program and someone request a new field and you have to do a complete refactor of your database setup. Starting your database with Models and Migrations allows you to make Model changes that will be applied to your existing database files.
+I feel the Sequelize documentation starts on the wrong page. _Getting Started_ has you build a simple, but dead end database configuration that does not allow for changes after it is populated. So you build your cool program and someone request a new field and you have to do a complete refactor of your database setup.
 
-This setup does not include Sequelize CLI and I don't recommend it. With that, you are on your own to create the model files. Look at the examples and create them by hand. Then use `yarn run db-migrate` script to set them up. If your migration files throwing errors on start up, look at your models, especially column types, they should all be using DataTypes.
+A better way is to starting your database with Models, Migrations and Seeds in mind. This allows you to make Model changes and bulk inserts that will be applied to your new and existing database files.
+
+This setup does not include Sequelize CLI and I don't recommend it. We don't need `init`, model creation is just as easy to do in the model files and we have a script for migrations. Look at the examples and create them by hand. Then use `yarn run db-migrate` script to set them up. If your migration files are throwing errors on start up, look at your models, especially column types, they should all be using `DataTypes`.
+
+You can add data to your database on creation by creating seeder files in the `model-seeds` directory. Take a look at the examples. One thing that is not mentioned in the Sequelize docs is that required fields without a default value need to be specifically inserted or a validation error will occur. That's why the id, createdAt, and updatedAt are in the seeds.
+
+Migrations and Seeds are tracked in your database. Each time the DB is opened, the `SequlizeMeta` table will be checked and only new migrations and seeds will be run.
 
 > **Important Opinion and Technical note**: Model file names should be in `plural-lower-kebab-case`. All references in your code should be in `camelCase`. This simplifies the naming throughout the project.
 
-This configuration uses redux actions to send and receive database requests. All transaction go through the Redux action `task.js` file.
+This configuration uses redux to send and receive database requests. All transaction go through the Redux action `tables.js` file. You will notice there is only one Action Creator.
 
-> Opinion note: There are a lot of different ways to set up a database. For instance a similar effect could be done with redux middleware. While this current configuration has tight integration with the database, I felt the action file allows for a clean delineation for database requests so different backends could be substituted if there was a shared front end codebase buy simple replacing the actions file IPC with Axios/fetch methods or whathave you.
+The way this works:
+
+- In the **App** window, the Dispatch Type, or `rType` is combined with `table` and an `options` object that will be sent to the database. I'll call this combined object the `optObj` here.
+- The `optObj` is then sent to **Main** with `ipcRenderer.send('TO_DB', optObj)`. Meanwhile it sets itself to listen with `ipcRenderer.once(rType, (err, result))`. **See 'DB Return' Note Below**.
+- **Main** passes `optObj` on untouched to the **Background** window.
+- `return actionTypes[rType](optObj)` is used to route the optObj to the proper function.
+- `model[table]` is used inside those functions to match the model.
+- Once the DB has finished, a returnData object is created with the rType, table and an array of results, regardless of what is returned.
+- **Background** ipcRenderer.send('FROM_DB', returnData) to **Main**.
+- **Main** pulls out the `rType` and uses it as the channel.
+- The **App** window receives the object and uses the `rType` as the `action.type` and passes the `table` and data as payload.
+
+> **DB Return:** In this case, we only have one Action Creator and only one table, the likelihood of a conflict is small. If you add another ipcRenderer.once with the same channel, returns may come in out of order and cause the wrong data to pass through the wrong reducer or error.
+
+You don't need to use Redux either. While I don't have any working examples in this project, you could simply export something like this to your react components through `Context` or imports:
+
+```js
+export const rDB = options =>
+  new Promise(resolve => {
+    ipcRenderer.send('TO_DB', options);
+    const { rType } = options;
+    ipcRenderer.once(rType, (event, result) => resolve(result));
+  });
+```
+
+Then use it in your files like:
+
+```js
+handleFormSubmit(event) {
+    event.preventDefault();
+    rDB({ rType: 'TABLE_UPDATE', table: 'tasks'  ...formItems })
+      .then(result => this.setState({ data: result..data }))
+      .catch(() => this.setState({ error: 'DB Error', data: null }));
+  }
+```
+
+> **Opinion note:** There are a lot of different ways to set up a database. For instance a similar effect could be done with redux middleware. While this current configuration has tight integration with the database, I felt the action file allows for a clean delineation for database requests so different backends could be substituted if there was a shared front end codebase buy simple replacing the actions file IPC with Axios/fetch methods or what have you.
 
 ## Modifications and features
 
 - Single package.json setup
 - Two separate Webpack bundles
-- Working Sequelize Models and Migrations
+- Working Sequelize Models, Migrations and Seeds
 - On the fly DB file creation
 - DB file backup on close
 - Hidden DB renderer window with IPC communication through UI renderer.
@@ -27,20 +69,25 @@ This configuration uses redux actions to send and receive database requests. All
 ## New and Updated Files and Folder Descriptions
 
 - `app/`
-  - `actions/tasks.js` _new_: Redux actions that ipcRenderer for communication to main which passes that on to background.
+  - `actions/tables.js` _new_: Redux actions that ipcRenderer for communication to main which passes that on to background.
   - `components/Home.js` _updated_: Basic display of input and list data via database.
   - `db/`, new\_: Contains the DB logic. Index is basically method switch. The single function takes an action type and configuration string or object.
     - `connection.js` creates an instance of Sequelize and automatically adds the models and associations on start up based on the 'models' directory.
     - `migrations.js` automatically creates or updates the current DB to the latest migration.
-    - `controllers/` _new_: This is where the Sequelize logic goes to work with models (CRUD stuff). The current demonstration logic is `taskFetchAll` to return all tasks and `taskUpdate` to create or update tasks.
+    - `controllers/` _new_: This is where the Sequelize logic goes to work with models (CRUD stuff). The current demonstration logic is `tableFetchAll` to return all tasks and `tableUpdate` to create or update tasks.
   - `background.js` and `app/background.html` _new_: These are for the hidden window that runs the Database. background.js is bundled by webpack and receives requests via ipcRenderer from main and passes them to the `db/index.js` file.
   - `main.dev.js` _updated_: Adds config for background window and ipcMain for window to window communication.
 - `config/`
-  - `webpack.config.base`, `config/webpack.config.renderer.xxx` : using `CopyWebpackPlugin` copies the `Models` and `Migrations` folders to `app/dist` on build creates two renderer bundles.
-- `models/`_new_: Sequelize 4.x models
-- `migrations/`_new_: All files in here are auto generated by the db-migrate script
+  - `webpack.config.base`, `config/webpack.config.renderer.xxx` : using `CopyWebpackPlugin` copies the `models`, `model-seeds` `migrations` folders to `app/dist` on build creates two renderer bundles.
+- `migrations/`_new_: All files in here are auto generated by the db-migrate script. You should not need to edit them.
+- `model-seeds`: Seed files can add data to your database on creation.
+- `models/`_new_: Sequelize 4.x models. These work just like the Sequlize docs.
 - `test/db/` _new_: Test for database.
 - `package.json` _updated_: New script, db-migrate, for running migrations as well as some additional packages.
+
+> I broke Sequelize convetion by calling the seeder directory `model-seeds` because I wanted to keep it near the `models` and `migrations` directories.
+
+---
 
 <div align="center">
 <br>

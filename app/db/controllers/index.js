@@ -1,5 +1,5 @@
-import tasks from './tasks';
+import tables from './tables';
 
 export default {
-  tasks
+  tables
 };

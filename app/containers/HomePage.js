@@ -1,15 +1,15 @@
 // @flow
 import { connect } from 'react-redux';
 import Home from '../components/Home';
-import * as TaskActions from '../actions/tasks';
+import * as TableActions from '../actions/tables';
 
 function mapStateToProps(state) {
   return {
-    tasks: state.tasks
+    tasks: state.tables.tasks
   };
 }
 
 export default connect(
   mapStateToProps,
-  TaskActions
+  TableActions
 )(Home);
