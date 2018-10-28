@@ -58,9 +58,7 @@ const migrate = async (currentDB, action, dir) => {
 
   const actions = {
     migrateUp: () => umzug.up().then(() => 'done'),
-    migrateDown: () => umzug.down(),
-    seedUp: () => umzug.up(),
-    seedDown: () => umzug.down()
+    migrateDown: () => umzug.down()
     // migrateReset: () => umzug.down({ to: 0 }),
     // migrateHardReset: () =>
     //   new Promise((resolve, reject) => {
