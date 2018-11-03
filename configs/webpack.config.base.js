@@ -5,7 +5,16 @@
 import path from 'path';
 import webpack from 'webpack';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import { dependencies } from '../package';
+import CleanWebpackPlugin from 'clean-webpack-plugin';
+import { dependencies, copyToDistFolders } from '../package';
+
+// for sequelize database folders
+const distDir = path.join(__dirname, '..', 'app', 'dist');
+const cleanOptions = {
+  root: distDir,
+  verbose: true,
+  dry: false
+};
 
 export default {
   externals: [...Object.keys(dependencies || {})],
@@ -49,19 +58,13 @@ export default {
     new webpack.NamedModulesPlugin(),
 
     // for sequelize database folders
-    new CopyWebpackPlugin([
-      {
-        from: 'migrations',
-        to: path.join(__dirname, '..', 'app', 'dist', 'migrations')
-      },
-      {
-        from: 'model-seeds',
-        to: path.join(__dirname, '..', 'app', 'dist', 'model-seeds')
-      },
-      {
-        from: 'models',
-        to: path.join(__dirname, '..', 'app', 'dist', 'models')
-      }
-    ])
+    new CleanWebpackPlugin(copyToDistFolders, cleanOptions),
+
+    new CopyWebpackPlugin(
+      copyToDistFolders.map(folder => ({
+        from: folder,
+        to: path.join(distDir, folder)
+      }))
+    )
   ]
 };
